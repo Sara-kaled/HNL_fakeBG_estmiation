@@ -1,0 +1,810 @@
+% =============================================================================
+% Fake-Electron Background Study — HNL μe VBF
+% Beamer presentation, ATLAS Internal style, narrative flow:
+%   each idea is "concept → plot/table → conclusion → next idea"
+% Build:   pdflatex fake_background_study.tex   (twice)
+% Figures: place output PDFs in figures/ — see slides/collect_figures.sh
+% Filenames in \includegraphics match the framework outputs exactly.
+% =============================================================================
+\documentclass[10pt,aspectratio=169]{beamer}
+\usetheme{Boadilla}
+\usecolortheme{seahorse}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+
+\definecolor{atlasblue}{RGB}{0,40,90}
+\definecolor{atlasred} {RGB}{200,16,46}
+\definecolor{conclbg}  {RGB}{220,235,250}
+\definecolor{conclbord}{RGB}{0,80,160}
+
+\setbeamercolor{title}{fg=atlasblue}
+\setbeamercolor{frametitle}{fg=atlasblue}
+\setbeamercolor{structure}{fg=atlasblue}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb}
+\usepackage{caption}
+\captionsetup{font=footnotesize,labelfont=bf}
+
+% Conclusion callout
+\newtcolorbox{conclude}[1][]{
+  enhanced,colback=conclbg,colframe=conclbord,
+  arc=2mm,boxrule=0.8pt,
+  fonttitle=\bfseries,coltitle=conclbord,
+  title=Conclusion,#1
+}
+
+\newcommand{\framenote}[1]{%
+  \begin{tcolorbox}[colback=conclbg,colframe=conclbord,arc=1.5mm,boxrule=0.6pt]
+  \footnotesize #1
+  \end{tcolorbox}}
+
+\newcommand{\fname}[1]{\texttt{\scriptsize #1}}
+
+\title[Fake $e$ — HNL $\mu e$ VBF]{Fake-Electron Background Study\\for the HNL $\mu e$ VBF Analysis}
+\author{Sara Abdelhameed}
+\institute{CERN — ATLAS Collaboration}
+\date{\today}
+
+\begin{document}
+
+% ============================================================================
+\begin{frame}
+  \titlepage
+  \vfill
+  \centering \scriptsize \textbf{ATLAS} \emph{Internal} \quad $\sqrt{s}=13$\,TeV, 140\,fb$^{-1}$
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 1 — Why are we here?
+% ============================================================================
+\section{Motivation}
+
+\begin{frame}{Heavy Neutral Lepton — VBF $\mu e$}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \footnotesize
+    Right-handed neutrino $N$ mixing with SM neutrinos.\\
+    VBF production via $W$-fusion + 2 forward jets.\\[1mm]
+    Final state under study:
+    \begin{itemize}\setlength{\itemsep}{0pt}
+      \item $\mu^{\pm} e^{\mp}$ (opposite sign)
+      \item 2 jets, $|\Delta\eta_{jj}|>3$, $m_{jj}>400$\,GeV
+      \item $0 < m_{ll} < 150$\,GeV
+    \end{itemize}
+    \column{0.45\textwidth}
+    \centering
+    \fbox{\rule{0pt}{3.0cm}\hspace{4.5cm}}\\
+    \scriptsize VBF $W$-fusion HNL diagram
+  \end{columns}
+  \vfill
+  \framenote{Soft leptons + VBF jets $\Rightarrow$ background dominated by
+  prompt-lepton processes (ttbar, Higgs, diboson) and a non-trivial
+  fake-electron component that requires a data-driven estimate.}
+\end{frame}
+
+\begin{frame}{What backgrounds do we have?}
+  \footnotesize
+  \begin{tabular}{ll}
+    \toprule
+    Process & How it enters the SR \\
+    \midrule
+    $t\bar t$ (di-lepton)        & charge-flipped to SS in CR; OS-natural in SR \\
+    Single-$t$ (Wt, t-/s-ch.)    & W-decay leptons + flip \\
+    $Z\to\tau\tau$               & true $\mu e$ from $\tau$ decays \\
+    Diboson (WW/WZ/ZZ)           & multi-lepton final states \\
+    VBF Higgs $H\to WW^\ast$     & dominant prompt in VBF SR \\
+    W+jets                       & $W\to\mu\nu$ + jet-fake $e$ \\
+    \midrule
+    \textbf{Fake $e$ background} & jet$\to e$ mis-ID, $b/c\to e$, $\gamma\to e$ \\
+    \bottomrule
+  \end{tabular}
+  \vfill
+  \framenote{Prompt MC handles $t\bar t$/Higgs/V/diboson/single-$t$/W+j.\\
+  Fakes (jet$\to e$) come from QCD multijet (poorly modelled in MC) and
+  must be estimated from data via the Asymptotic Matrix Method (AMM).}
+\end{frame}
+
+\begin{frame}{What is a ``fake'' electron?}
+  \footnotesize
+  Reconstructed $e$ \emph{not} from a prompt $W,Z,H$ decay.
+  In MC tagged via \texttt{el\_truth\_isPrompt} and \texttt{el\_IFFClass}.
+
+  \vspace{2mm}
+  Two electron working points:
+  \begin{itemize}\setlength{\itemsep}{0pt}
+    \item \textbf{Loose} (denominator) — \texttt{LooseBLayerLH + NonIso}
+    \item \textbf{Tight} (numerator/SR) — \texttt{TightLH + Tight\_VarRad}
+  \end{itemize}
+
+  \vspace{2mm}
+  \[
+    \varepsilon_f = P(\text{tight}\,|\,\text{loose, fake}),\quad
+    \varepsilon_r = P(\text{tight}\,|\,\text{loose, prompt})
+  \]
+
+  \framenote{The matrix method inverts these two efficiencies to extract
+  the per-event fake-yield contribution. Next slides: how we measure each.}
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 2 — Object and region definitions
+% ============================================================================
+\section{Objects \& Regions}
+
+\begin{frame}{Electron working points}
+  \scriptsize
+  \begin{tabular}{lll}
+    \toprule
+    & Loose (denominator) & Tight (numerator/SR) \\
+    \midrule
+    ID                & \texttt{LooseBLayerLH}      & \texttt{TightLH} \\
+    Isolation         & \texttt{NonIso}             & \texttt{Tight\_VarRad} \\
+    $|\eta|$          & $<2.47$, crack-veto         & same \\
+    $|d_0/\sigma|$    & $<5$                        & $<5$ \\
+    $|z_0\sin\theta|$ & $<0.5$\,mm                  & $<0.5$\,mm \\
+    Branch            & \texttt{el\_select\_loose\_NOSYS}
+                      & \texttt{el\_select\_tight\_NOSYS} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{2mm}
+  Truth flags used for MC subtraction:
+  \fname{el\_truth\_isPrompt}, \fname{el\_IFFClass},
+  \fname{el\_charge\_misid\_effSF\_tight\_NOSYS}.
+\end{frame}
+
+\begin{frame}{Muon, jet and MET selection}
+  \scriptsize
+  \textbf{Muon}: \texttt{Loose} / \texttt{Medium} ID, \texttt{NonIso} /
+  \texttt{Tight\_VarRad} iso, $|d_0/\sigma|<3$, $|z_0\sin\theta|<0.5$,
+  $|\eta|<2.5$.  Branches: \fname{mu\_select\_\{loose,tight\}\_NOSYS}.
+
+  \vspace{2mm}
+  \textbf{Jets}: AntiKt4EMPFlowJets, JVT \texttt{baselineJvtTight}, $b$-tag
+  \texttt{GN2v01\_FixedCutBEff\_85}.\\
+  VBF: $j_1>35$, $j_2>20$\,GeV, $|\Delta\eta_{jj}|>3$, $m_{jj}>400$\,GeV.
+
+  \vspace{2mm}
+  \textbf{MET}: \fname{met\_met\_NOSYS}.  No MET cut applied to the fake CR
+  (justified later by the MET-cut scan and MET-split test).
+\end{frame}
+
+\begin{frame}{Region definitions}
+  \scriptsize
+  \begin{tabular}{lcccc}
+    \toprule
+    Region & Charge & $b$-jets & Lepton $p_T$ & Kinematics \\
+    \midrule
+    Fake-CR (SS)         & SS & $=0$ & $\mu>26,\ e\geq 5$ & $\geq 2$ jets \\
+    Prompt-CR (OS)       & OS & --   & $\mu>26,\ e\geq 5$ & --   \\
+    HNL\_CR\_$t\bar t$   & OS & $\geq 1$ & $\mu>45,\ e>15$ & VBF, $m_{jj}>400$, $0<m_{ll}<150$ \\
+    HNL\_CR\_$Z\tau\tau$ & OS & $=0$ & $35<\mu<45,\ e>15$ & VBF, $m_{jj}>400$, $0<m_{ll}<150$ \\
+    HNL\_VR              & OS & $=0$ & $\mu>45,\ e>15$ & VBF, $m_{jj}<400$, $0<m_{ll}<150$ \\
+    HNL\_SR              & OS & $=0$ & $\mu>45,\ e>15$ & VBF, $m_{jj}>400$, $0<m_{ll}<150$ \\
+    \bottomrule
+  \end{tabular}
+  \framenote{Defined in \fname{utils/SelectionUtils.h}: \fname{isFakeCR},
+  \fname{isPromptCR}, \fname{isTtbarCR}, \fname{isZtautauCR}, \fname{isVR},
+  \fname{isSR}.}
+\end{frame}
+
+\begin{frame}{Triggers — asymmetry between measurement and application}
+  \scriptsize
+  \textbf{Fake CR \& Prompt CR (where $\varepsilon_f, \varepsilon_r$ are measured):}
+  muon-only triggers + muon-only matching.\\
+  \textbf{SR / VR / CR\_$t\bar t$ / CR\_$Z\tau\tau$ (where AMM is applied):}
+  full muon OR electron trigger + matching.
+
+  \vspace{2mm}
+  \begin{tabular}{ll}
+    \toprule
+    Year & Muon HLT chains \\
+    \midrule
+    2015     & \fname{HLT\_mu20\_iloose\_L1MU15} $\lor$ \fname{HLT\_mu40} \\
+    2016--18 & \fname{HLT\_mu26\_ivarmedium} $\lor$ \fname{HLT\_mu50} \\
+    2022     & \fname{HLT\_mu24\_ivarmedium\_L1MU14FCH} $\lor$ \fname{HLT\_mu50\_L1MU14FCH} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{1mm}
+  Matching: \fname{globalTriggerMatch\_NOSYS} (data15 + universal),
+  \fname{mu\_trigMatched\_HLT\_*} (data16+, MC).
+  Electron triggers and \fname{el\_trigMatched\_*} are added only in SR/VR/CRs.
+
+  \framenote{Single-$e$ HLT requires a near-tight $e$ at L1 $\Rightarrow$ would
+  bias the loose population $\Rightarrow$ keep the electron unbiased
+  in the fake-rate measurement (HNL multilepton arXiv:2204.11138).}
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 3 — The Matrix Method
+% ============================================================================
+\section{Method}
+
+\begin{frame}{Asymptotic Matrix Method}
+  \footnotesize
+  Given $\varepsilon_f$ and $\varepsilon_r$, the per-electron weight is:
+  \[
+    w_T = \frac{\varepsilon_f(\varepsilon_r-1)}{\varepsilon_r-\varepsilon_f}\;\;(<0),\quad
+    w_L = \frac{\varepsilon_f\varepsilon_r}{\varepsilon_r-\varepsilon_f}\;\;(>0).
+  \]
+  \[
+    N_{\text{fake}}^{\text{tight, region}} =
+      \sum_{\text{loose-passing events in region}} w_{T/L}
+  \]
+  Implemented in \fname{AMM/AMM\_ElectronOnly.C} and (cross-check) by
+  \fname{CP::AsymptMatrixTool} inside the AnalysisAlgorithms framework.
+
+  \framenote{Now we need to measure $\varepsilon_f$ and $\varepsilon_r$.}
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 4 — Fake efficiency
+% ============================================================================
+\section{Fake Efficiency $\varepsilon_f$}
+
+\begin{frame}{Measuring $\varepsilon_f$ in the SS $\mu e$ CR}
+  \footnotesize
+  Data-driven, prompt-MC subtracted:
+  \[
+    \varepsilon_f(p_T,|\eta|) =
+      \frac{N_T^{\text{data}} - N_T^{\text{MC prompt}}}
+           {N_L^{\text{data}} - N_L^{\text{MC prompt}}}
+  \]
+  Truth-prompt cut applied to MC: \fname{isMCPromptElectron \&\& isMCPromptMuon}\\
+  Charge-misID SF applied: \fname{el\_charge\_misid\_effSF\_tight\_NOSYS}\\[1mm]
+  Macros: \fname{efficiency/MC\_eff.C}, \fname{data\_eff.C},
+  \fname{calculate\_fake\_rates.C}.
+\end{frame}
+
+\begin{frame}{$\varepsilon_f(p_T, |\eta|)$ — 2D map}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/fake_rate_nominal.pdf}\\
+  \fname{efficiency/outputs/syst/fake\_rate\_nominal.pdf}
+  \framenote{$\varepsilon_f$ rises with $p_T$ — features dominant LF jet$\to e$
+  fakes whose tight-pass rate increases at higher pT (verified in backup).}
+\end{frame}
+
+\begin{frame}{$\varepsilon_f$ vs $p_T$}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/CR_pt_fake.pdf}\\
+  \fname{plotting/outputs/02\_1d\_rates/fake/CR\_pt.pdf}
+  \framenote{$\varepsilon_f \approx 0.08$ at low $p_T$, climbs to $\approx 0.28$ at high $p_T$.}
+\end{frame}
+
+\begin{frame}{$\varepsilon_f$ vs $|\eta|$}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/CR_eta_fake.pdf}\\
+  \fname{plotting/outputs/02\_1d\_rates/fake/CR\_eta.pdf}
+  \framenote{Mild $|\eta|$ dependence; modest rise in the endcaps as
+  expected from forward charge-flip + photon-conversion contributions.}
+\end{frame}
+
+\begin{frame}{$\varepsilon_f$ vs $|d_0/\sigma|$ — does the loose IP cut hurt us?}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/CR_d0sig_fake.pdf}\\
+  \fname{plotting/outputs/02\_1d\_rates/fake/CR\_d0sig.pdf}
+  \framenote{$\varepsilon_f$ approximately flat in $|d_0/\sigma|$
+  $\Rightarrow$ no displaced-fake population leaking into ε_f.
+  Justifies the standard event-level IP cut $|d_0/\sigma|<5$.}
+\end{frame}
+
+\begin{frame}{$\varepsilon_f$ vs $E_T^{\text{miss}}$ — motivates the MET systematic}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/CR_met_fake.pdf}\\
+  \fname{plotting/outputs/02\_1d\_rates/fake/CR\_met.pdf}
+  \framenote{$\varepsilon_f$ shows mild MET dependence: low-MET (multijet-rich)
+  vs high-MET (W/ttbar-rich) populations have different tight-pass rate.
+  This is captured by the dedicated MET systematic NP.}
+\end{frame}
+
+\begin{frame}{MET-split: low vs high MET regions for the syst}
+  \centering
+  \begin{tabular}{cc}
+    \includegraphics[width=0.42\textwidth]{figures/CR_MET_low_pt_fake.pdf} &
+    \includegraphics[width=0.42\textwidth]{figures/CR_MET_high_pt_fake.pdf}\\
+    \scriptsize MET $<50$\,GeV & \scriptsize MET $>50$\,GeV
+  \end{tabular}\\
+  \fname{plotting/outputs/02\_1d\_rates/fake/CR\_MET\_\{low,high\}\_pt.pdf}
+  \framenote{Split point chosen at MET=50\,GeV (also tested 40 in the
+  diagnostic). Max bin pull $|\Delta|/\sigma_\text{stat}=3.7\sigma$
+  $\Rightarrow$ resolved $\Rightarrow$ kept as NP.}
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 5 — Real efficiency
+% ============================================================================
+\section{Real Efficiency $\varepsilon_r$}
+
+\begin{frame}{Measuring $\varepsilon_r$ in the OS prompt CR}
+  \footnotesize
+  $\varepsilon_r = N_T^{\text{MC prompt}} / N_L^{\text{MC prompt}}$, evaluated bin-by-bin.\\
+  Macro: \fname{efficiency/real\_eff.C}.
+\end{frame}
+
+\begin{frame}{$\varepsilon_r(p_T, |\eta|)$ — 2D map}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/real_eff_2D.pdf}\\
+  \fname{plotting/outputs/eff\_maps/real\_eff\_2D.pdf}
+\end{frame}
+
+\begin{frame}{$\varepsilon_r$ vs $p_T$ and $|\eta|$}
+  \centering
+  \begin{tabular}{cc}
+    \includegraphics[width=0.42\textwidth]{figures/CR_pt_real.pdf} &
+    \includegraphics[width=0.42\textwidth]{figures/CR_eta_real.pdf}\\[-1mm]
+    \scriptsize \fname{CR\_pt\_real.pdf} & \scriptsize \fname{CR\_eta\_real.pdf}
+  \end{tabular}
+  \framenote{$\varepsilon_r$ rises from $\sim 0.55$ at $p_T=20$\,GeV to
+  $\sim 0.93$ at $p_T>50$\,GeV. The matrix denominator
+  $\varepsilon_r-\varepsilon_f$ stays $>0.4$ everywhere.}
+\end{frame}
+
+\begin{frame}{$\varepsilon_r$ vs $|d_0/\sigma|$ and MET}
+  \centering
+  \begin{tabular}{cc}
+    \includegraphics[width=0.42\textwidth]{figures/CR_d0sig_real.pdf} &
+    \includegraphics[width=0.42\textwidth]{figures/CR_met_real.pdf}\\[-1mm]
+    \scriptsize \fname{CR\_d0sig\_real.pdf} & \scriptsize \fname{CR\_met\_real.pdf}
+  \end{tabular}
+  \framenote{Real-electron efficiency essentially flat in $|d_0/\sigma|$
+  and MET in the prompt-CR phase space — confirms the AMM only needs
+  $\varepsilon_r(p_T,|\eta|)$ as parametrization.}
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 6 — Cutflows: where do events land?
+% ============================================================================
+\section{Cutflows}
+
+\begin{frame}{Data, MC and Fake cutflows — VBF SR/VR}
+  \footnotesize
+  Per-cut yields, identical cut sequence (\fname{utils/SelectionUtils.h}):
+
+  \fname{studies/MC\_cutflow.C}, \fname{data\_cutflow.C}, \fname{fake\_cutflow.C}
+
+  \vspace{2mm}
+  Final SR/VR yields populate the BG-composition plot (next slide).
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 7 — Apply AMM, see the BG composition
+% ============================================================================
+\section{Application}
+
+\begin{frame}{AMM weight branches}
+  \scriptsize
+  \fname{AMM/data\_with\_electron\_fake\_weights.root}:
+  \begin{tabular}{ll}
+    \toprule
+    Branch & Meaning \\
+    \midrule
+    \fname{fake\_weight\_nominal}    & central per-event AMM weight \\
+    \fname{fake\_weight\_MET\_up/down}    & MET systematic \\
+    \fname{fake\_weight\_comp\_up/down}   & Composition systematic \\
+    \fname{fake\_weight\_real\_up/down}   & Prompt-subtraction $\pm 20\%$ \\
+    \fname{fake\_weight\_statUp/Down}     & Stat. error \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Background composition per region}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/bkg_composition.pdf}\\
+  \fname{studies/outputs/bkg\_composition.pdf}
+  \framenote{Fake fraction $\approx 77\%$ in the SS CR (closure check),
+  $\sim 7\%$ in the SR. VBF $H\to WW$ is the dominant prompt in the SR.}
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 8 — Systematic uncertainties (each on its own slide pair)
+% ============================================================================
+\section{Systematic Uncertainties}
+
+\begin{frame}{Statistical}
+  \footnotesize
+  Per-bin Poisson errors propagate to symmetric up/down maps.
+  Macro: \fname{efficiency/build\_fake\_systematics.C} → \fname{fake\_rate\_statUp/Down}.
+  \framenote{Largest contribution at high $p_T$ where data CR statistics are limited.}
+\end{frame}
+
+\begin{frame}{MET dependence — concept and impact}
+  \footnotesize
+  $\varepsilon_f$ split at MET $=50$\,GeV; the up/down maps come from the
+  larger of the two splits.\\
+  \centering
+  \includegraphics[width=0.4\textwidth]{figures/fake_rate_MET_up.pdf}
+  \includegraphics[width=0.4\textwidth]{figures/fake_rate_MET_down.pdf}\\
+  \scriptsize \fname{outputs/syst/fake\_rate\_MET\_\{up,down\}.pdf}
+  \framenote{Max bin pull $|\Delta|/\sigma_\text{stat}=3.7\sigma$
+  $\Rightarrow$ resolved $\Rightarrow$ kept as NP.}
+\end{frame}
+
+\begin{frame}{Composition systematic — concept and impact}
+  \footnotesize
+  Symmetric: $f_c(p_T,|\eta|) = 2(\varepsilon_{SR}-\varepsilon_{CR})/(\varepsilon_{SR}+\varepsilon_{CR})$
+  via truth-source reweighting.\\
+  Macro: \fname{build\_composition\_systematic.C}.
+  \centering
+  \includegraphics[width=0.4\textwidth]{figures/fake_rate_comp_up.pdf}
+  \includegraphics[width=0.4\textwidth]{figures/fake_rate_comp_down.pdf}\\
+  \scriptsize \fname{outputs/syst/fake\_rate\_comp\_\{up,down\}.pdf}
+\end{frame}
+
+\begin{frame}{Prompt-subtraction systematic}
+  \footnotesize
+  $\pm 20\%$ on the prompt-MC normalization:
+  $\varepsilon_f = (N_T^{\text{data}} - k\,N_T^{\text{MC}})/(N_L^{\text{data}} - k\,N_L^{\text{MC}})$ with $k = 1\pm 0.2$.
+  \centering
+  \includegraphics[width=0.4\textwidth]{figures/fake_rate_real_up.pdf}
+  \includegraphics[width=0.4\textwidth]{figures/fake_rate_real_down.pdf}\\
+  \scriptsize \fname{outputs/syst/fake\_rate\_real\_\{up,down\}.pdf}
+\end{frame}
+
+\begin{frame}{Total systematic — combined}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/variation_pt_total_syst_central.pdf}\\
+  \fname{outputs/syst/variation\_pt\_total\_syst\_central.pdf}
+  \framenote{Stat + MET + composition + prompt-subtraction added in quadrature
+  per bin; capped at 150\% to prevent single-bin tail blow-ups.}
+\end{frame}
+
+% ============================================================================
+% NARRATIVE 9 — Closure & summary
+% ============================================================================
+\section{Closure \& Summary}
+
+\begin{frame}{MC closure}
+  \footnotesize
+  Truth count vs MM prediction in the fake CR (after the truth-tight fix):
+  \begin{tabular}{lcc}
+    \toprule
+    Region & $N_F^{\text{truth}}$ & $N_F^{\text{MM}}$ \\
+    \midrule
+    Preselection & 138.8\,k & 26.8\,k \\
+    Fake CR      & 127      & 387 \\
+    VR           & 17       & 6 \\
+    SR           & 178      & $-15$ \\
+    \bottomrule
+  \end{tabular}
+  \framenote{In the CR (after correctly counting only tight-fakes on the truth
+  side), MM predicts $\sim 3\times$ truth — explained by the data-vs-MC
+  ε\_f gap (heavy-flavor + multijet not in MC). See checks in backup.}
+\end{frame}
+
+\begin{frame}{Summary}
+  \begin{itemize}\setlength{\itemsep}{0pt}
+    \item Data-driven fake-$e$ background measured via AMM in SS $\mu e$ CR
+    \item Muon-only triggering at measurement; full mu$\lor$e at application
+    \item $\varepsilon_f$: $0.08 \to 0.28$ across $p_T$;\ \ \ $\varepsilon_r$: $0.55 \to 0.93$
+    \item Four NPs: stat, MET, composition, prompt-subtraction
+    \item Per-event \fname{fake\_weight\_*} branches drive plotting / TRExFitter
+  \end{itemize}
+  \framenote{Validated by 11 cross-check macros (backup) — closure, multijet,
+  MET-split, fake-factor agreement, charge-misID SF, smoothing.}
+\end{frame}
+
+% ============================================================================
+% ============================================================================
+% BACKUP — each cross-check on its own slide
+% ============================================================================
+% ============================================================================
+\appendix
+
+\begin{frame}\centering\Huge Backup\end{frame}
+
+% Tiny helper for the "Motivation:" tag at the top of every backup slide
+\newcommand{\motiv}[1]{%
+  \par\vspace{-1mm}
+  \textit{\color{atlasblue}\footnotesize Motivation:} {\footnotesize #1}\par\vspace{1mm}}
+
+\section*{A — Investigation: where did the high-$p_T$ $\varepsilon_f$ come from?}
+
+\begin{frame}{Trigger-bias study (the structural finding)}
+  \motiv{First version of $\varepsilon_f$ rose to $\sim 0.5$ at high $p_T$ —
+  unphysical for a fake rate. Single-electron HLT requires a near-tight $e$
+  at L1; if applied to the CR, the loose population is HLT-biased toward
+  tight-passing. Tested by switching to muon-only triggering at measurement.}
+  \centering
+  \footnotesize
+  Before: \fname{passTrigger = mu \char`\|\char`\| e}, $\varepsilon_f^{\text{[50-200]}}\approx 0.4$.\\
+  After:  \fname{passTrigger = mu only}, $\varepsilon_f^{\text{[50-200]}}\approx 0.20$--$0.30$.
+  \framenote{Electron-trigger removal restored a physically reasonable shape.
+  Standard ATLAS recipe (HNL multilepton arXiv:2204.11138, SUSY 2-l SS arXiv:1909.08457).
+  Now applied uniformly in MC\_eff, data\_eff, real\_eff. SR/VR keep the
+  full mu$\lor$e trigger so analysis acceptance isn't reduced.}
+\end{frame}
+
+\begin{frame}{$p_T$ binning iterations}
+  \motiv{Standard ATLAS bins $\{15,25,35,50,80,200\}$. We tested several
+  variations to see which gave a stable $\varepsilon_f$ measurement.}
+  \footnotesize
+  \begin{tabular}{ll}
+    \toprule
+    Binning & Outcome \\
+    \midrule
+    $\{15,25,35,50,80,200\}$ & last bin stat-limited; flat 100\% syst flagged \\
+    $\{15,25,35,50,200\}$    & merged tail; better stats; central choice for a while \\
+    $\{5,15,25,35,50,60,200\}$ & added low-pT bin + transition; \fname{[50,60]} statistically broken (LF=444\%) \\
+    \textbf{$\{5,15,25,35,50,200\}$} & current — keeps low-pT bin, drops broken transition \\
+    \bottomrule
+  \end{tabular}
+  \framenote{Final binning: \fname{kPtBins = \{5,15,25,35,50,200\}} in
+  \fname{utils/SelectionUtils.h}. The $[50,60]$ split is demonstrably
+  unstable so it's removed.}
+\end{frame}
+
+\begin{frame}{Is rising $\varepsilon_f$ at high $p_T$ a bug or physics?}
+  \motiv{$\varepsilon_f$ rises with $p_T$ from 0.08 (low) to 0.28 (high).
+  Initially looked alarming — but is this real physics or a measurement bug?}
+  \footnotesize
+  Tested four hypotheses (each in the next several backup slides):
+  \begin{itemize}\setlength{\itemsep}{0pt}
+    \item Charge-flip contamination (charge-misID SF study)
+    \item Multijet (anti-iso $\mu$ + MET-split tests)
+    \item Heavy-flavor real-electron leakage (truth-source + d0sig + $\Delta R$)
+    \item AMM vs fake-factor formulation fragility (fake-factor compare)
+  \end{itemize}
+  \framenote{All four hypotheses ruled out. LF jet$\to e$ dominates the
+  loose population at every $p_T$, with the natural physics expectation
+  that LF-rich high-$p_T$ jets pass tight more often. \emph{ε\_f rising
+  with $p_T$ is real physics, not a bug.}}
+\end{frame}
+
+\section*{B — Cross-checks (each with motivation \& conclusion)}
+
+\begin{frame}{Charge-misID SF distributions}
+  \motiv{Charge-flipped $e$ events appear in the SS CR but are real
+  electrons (high tight-pass rate). If MC under-models the flip rate, MC
+  prompt subtraction is too small $\Rightarrow$ measured $\varepsilon_f$ is too high.
+  Test by inspecting \fname{el\_charge\_misid\_effSF\_tight\_NOSYS}.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/sf_vs_pt_eta.pdf}\\
+  \fname{studies/checks/outputs/sf\_vs\_pt\_eta.pdf}\\
+  \framenote{Mean SF $\approx 1.0000$, tail $>1.05$ is $0.027\%$ of electrons.
+  MC charge-flip rate matches data $\Rightarrow$ \emph{ruled out as the source
+  of the $\varepsilon_f$ rise}.  SF still applied to the prompt-MC subtraction.}
+\end{frame}
+
+\begin{frame}{Truth-source breakdown of loose fakes}
+  \motiv{If high-$p_T$ ``fakes'' were actually heavy-flavor real $e$
+  ($b/c\to e$), the matrix method would be misclassifying real-$e$ as
+  fake $\Rightarrow$ artificially high $\varepsilon_f$. Use
+  \fname{el\_IFFClass} truth tag to break the loose-fake population into
+  B / C / Conv / LF / Tau / Other.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/truth_source_breakdown.pdf}\\
+  \fname{studies/checks/outputs/truth\_source\_breakdown.pdf}\\
+  \framenote{LF jet$\to e$ dominates at every $p_T$ ($65$--$82\%$). HF $<\!30\%$.
+  $\Rightarrow$ \emph{Loose fakes are genuine jet-mis-IDs, not real-$e$
+  contamination. Matrix method is valid; rising $\varepsilon_f$ is real physics.}}
+\end{frame}
+
+\begin{frame}{Data / MC$_\text{prompt}$ loose ratio}
+  \motiv{If MC prompt is a large fraction of the data loose denominator,
+  small mismodelings in MC could move $\varepsilon_f$ a lot. Quantify how
+  much of the loose denominator MC prompt actually accounts for.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/data_mc_loose_ratio.pdf}\\
+  \fname{studies/checks/outputs/data\_mc\_loose\_ratio.pdf}\\
+  \framenote{Ratio $\sim 460\times$ at low $p_T$, $\sim 2.6\times$ at high $p_T$.
+  MC prompts are a small fraction of the loose denominator.
+  $\Rightarrow$ \emph{Plenty of fakes for the matrix method to measure;
+  prompt subtraction not the bottleneck.}}
+\end{frame}
+
+\begin{frame}{$|d_0/\sigma|$ of loose fakes (per truth source)}
+  \motiv{Heavy-flavor electrons are displaced from the PV
+  ($|d_0/\sigma|\sim 2$--$4$); LF mis-IDs sit at the PV ($|d_0/\sigma|<1$).
+  Plot per truth source to verify the truth assignment is internally
+  consistent with reco IP.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/d0sig_distribution.pdf}\\
+  \fname{studies/checks/outputs/d0sig\_distribution.pdf}\\
+  \framenote{LF $\sim 0.8$, HF $\sim 1.5$, Conv $\sim 4.3$.
+  $\Rightarrow$ \emph{Reco IP confirms the truth-source assignment;
+  no anomalous displaced-fake leakage.}}
+\end{frame}
+
+\begin{frame}{$\Delta R(e, \text{nearest jet})$ of loose fakes}
+  \motiv{Real prompt $e$ are isolated ($\Delta R>1$). Jet$\to e$ fakes sit
+  inside the parent jet ($\Delta R<0.4$). Topological cross-check: do
+  truth-tagged fakes really live near jets?}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/dR_jet_distribution.pdf}\\
+  \fname{studies/checks/outputs/dR\_jet\_distribution.pdf}\\
+  \framenote{Loose fakes peak at small $\Delta R$ (embedded in jet);
+  prompt $e$ at large $\Delta R$.
+  $\Rightarrow$ \emph{Topological consistency confirms the truth
+  classification — high-$p_T$ loose are not stray prompt $e$.}}
+\end{frame}
+
+\begin{frame}{Fake factor vs Matrix method}
+  \motiv{The matrix method has $(\varepsilon_r-\varepsilon_f)$ in the
+  denominator — small at high $p_T$, can amplify $\varepsilon_r$-modeling
+  errors into the fake estimate. The fake factor $f=\varepsilon_f/(1-\varepsilon_f)$
+  has no $\varepsilon_r$ dependence: a robustness cross-check.}
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/fake_factor_compare.pdf}\\
+  \fname{studies/checks/outputs/fake\_factor\_compare.pdf}\\
+  \framenote{$w_L^{\text{AMM}}/w_L^{\text{FF}} = 1.02$--$1.15$.
+  $\Rightarrow$ \emph{Matrix method is not amplifying weights through
+  small $(\varepsilon_r-\varepsilon_f)$ — central result is robust against
+  $\varepsilon_r$ mismodeling.}}
+\end{frame}
+
+\begin{frame}{Multijet test — anti-isolated $\mu$ CR}
+  \motiv{If QCD multijet contaminates the standard fake CR, an anti-iso-$\mu$
+  region (μ failing tight isolation) should be enriched in QCD bb̄$\to\mu e$
+  $\Rightarrow$ different $\varepsilon_f$. Compute $\varepsilon_f$ in std
+  vs anti-iso CR.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/multijet_test.pdf}\\
+  \fname{studies/checks/outputs/multijet\_test.pdf}\\
+  \framenote{Anti-iso $\mu$ region has insufficient stats (negative MC weights,
+  $\varepsilon_f>1$ in many bins).
+  $\Rightarrow$ \emph{Inconclusive — superseded by the MET-split test (next)
+  which has the same goal but reliable statistics.}}
+\end{frame}
+
+\begin{frame}{MET-split test (replacement for the anti-iso test)}
+  \motiv{Multijet bb̄ events have no real $\nu \Rightarrow$ low MET.
+  Splitting the standard fake CR by MET separates multijet (low MET) from
+  W/ttbar fakes (high MET) using the existing CR sample with full statistics.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/met_split_test.pdf}\\
+  \fname{studies/checks/outputs/met\_split\_test.pdf}\\
+  \framenote{Low-MET vs high-MET $\varepsilon_f$ agree at $\sim 10\%$ level.
+  $\Rightarrow$ \emph{No significant multijet contamination in the fake CR.
+  MET cut not required for the central measurement.}}
+\end{frame}
+
+\begin{frame}{$\varepsilon_f$ vs MET-cut scan}
+  \motiv{To confirm the MET-split conclusion, scan $\varepsilon_f$ vs
+  progressively tighter MET thresholds (0--100\,GeV). Multijet would show
+  a clear drop above $\sim 30$\,GeV; W/ttbar fakes should be flat.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/eps_f_vs_met_cut.pdf}\\
+  \fname{studies/checks/outputs/eps\_f\_vs\_met\_cut.pdf}\\
+  \framenote{$\varepsilon_f$ flat across MET thresholds 0--80\,GeV in every
+  $p_T$ bin. $\Rightarrow$ \emph{Confirms no MET-cut needed; small residual
+  MET dependence absorbed by the dedicated MET systematic NP.}}
+\end{frame}
+
+\begin{frame}{$p_T$-cap diagnostic}
+  \motiv{Some ATLAS analyses (HNL, SUSY 2-l SS) cap the fake-rate measurement
+  at $p_T<50$\,GeV when high-$p_T$ bins fail standard quality criteria
+  (low purity, large stat error, small $\varepsilon_r-\varepsilon_f$ margin,
+  unphysical $\varepsilon_f$). Compute the per-bin diagnostic to decide
+  whether \emph{we} need a cap.}
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/justify_pt_cap.pdf}\\
+  \fname{studies/checks/outputs/justify\_pt\_cap.pdf}\\
+  \framenote{Per-bin $\varepsilon_f<0.30$, $\sigma_\text{stat}/\varepsilon_f<25\%$,
+  $\varepsilon_r-\varepsilon_f>0.15$, purity $>60\%$. After the trigger fix
+  every bin passes. $\Rightarrow$ \emph{No $p_T$ cap needed.}}
+\end{frame}
+
+\begin{frame}{Multi-variable fake-source view (8-panel)}
+  \motiv{One single plot summarizing truth-source composition vs every
+  relevant kinematic / topological variable. Used to spot any unexpected
+  shape or correlated dependence the per-variable plots might miss.}
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/fake_source_diagnostics.pdf}\\[-1mm]
+  \fname{studies/checks/outputs/fake\_source\_diagnostics.pdf}\\
+  \framenote{8 panels: $p_T$, $|\eta|$, $|d_0/\sigma|$, MET, $m_{ll}$,
+  $m_{jj}$, $|\Delta\eta_{jj}|$, $\Delta R(e,j_\text{lead})$.
+  $\Rightarrow$ \emph{LF dominates at every variable slice; no surprise
+  dependences; no extra parametrization motivated.}}
+\end{frame}
+
+\begin{frame}{Smoothing study (optional, not applied centrally)}
+  \motiv{Bin edges create discontinuous jumps in $\varepsilon_f$. Test
+  whether spline-smoothing per $|\eta|$ slice meaningfully changes the
+  AMM yield, or just removes cosmetic step features.}
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/smoothing_diagnostic.pdf}\\
+  \fname{studies/smoothing\_test/outputs/smoothing\_diagnostic.pdf}\\
+  \framenote{Cubic-spline-smoothed $\varepsilon_f$ produces yield within
+  $\sim 1\%$ of binned. $\Rightarrow$ \emph{Smoothing is cosmetic; central
+  result uses the binned map. Smoothed map archived as
+  \fname{fake\_eff\_smoothed.root}.}}
+\end{frame}
+
+\begin{frame}{MC closure with D1–D5 diagnostics}
+  \motiv{Apply the AMM weights to truth-MC and compare predicted-fake yield
+  to truth-fake count region by region. The 5 diagnostics inside
+  \fname{mc\_closure\_fake.C} (D1: per-pT effective $\varepsilon_f$;
+  D2: lepton-SF weight ratio; D3: pos./neg. AMM split; D4: tight vs loose-only
+  truth fakes; D5: stored-vs-truth $\varepsilon_f$ ratio) localize any
+  failure mode.}
+  \centering \footnotesize
+  \begin{tabular}{lcc}
+    \toprule
+    Region & $N_F^{\text{truth, tight}}$ & $N_F^{\text{MM}}$ \\
+    \midrule
+    Preselection & 138.8\,k & 26.8\,k \\
+    Fake CR      & 127      & 387 \\
+    VR           & 17       & 6 \\
+    SR           & 178      & $-15$ \\
+    \bottomrule
+  \end{tabular}\\
+  \fname{studies/outputs/mc\_closure\_fake\_SR\_shapes.root}\\
+  \framenote{D2: weight-SF ratio $0.997 \Rightarrow$ rules out SF mismatch.
+  D5: stored $\varepsilon_f \sim 2$--$3\times$ truth-MC value $\Rightarrow$
+  data-vs-MC fake-mix difference, which the composition NP captures.
+  $\Rightarrow$ \emph{Method validated; residual gap absorbed by syst.}}
+\end{frame}
+
+\begin{frame}{MET systematic significance test}
+  \motiv{Decide whether to KEEP MET as a systematic NP. Split the fake CR
+  at MET=40 and MET=50\,GeV; compute per-bin pull
+  $|\Delta|/\sigma_\text{stat}$. Pull$>1\sigma$ in any bin means the MET
+  dependence is statistically resolved.}
+  \footnotesize
+  Output of \fname{studies/met\_systematic\_investigation.C}:\\[1mm]
+  \begin{tabular}{lcc}
+    \toprule
+    Split point & Max bin pull & Bin location \\
+    \midrule
+    MET = 40\,GeV & $3.4\sigma$ & $p_T\!\in\![15,25]$, $|\eta|\!\in\![0,0.7]$ \\
+    MET = 50\,GeV & $3.7\sigma$ & $p_T\!\in\![35,50]$, $|\eta|\!\in\![1.6,2.0]$ \\
+    \bottomrule
+  \end{tabular}
+  \framenote{Both well above $1\sigma$.
+  $\Rightarrow$ \emph{MET dependence is real; kept as NP
+  (\fname{fake\_rate\_MET\_up/down}).}}
+\end{frame}
+
+\begin{frame}{Decision summary — what we kept and what we didn't}
+  \footnotesize
+  \begin{tabular}{ll}
+    \toprule
+    Decision & Outcome \\
+    \midrule
+    Trigger asymmetry (mu-only at meas.) & \textbf{KEPT} — fixed unphysical $\varepsilon_f$ rise \\
+    Charge-misID SF on prompt MC          & \textbf{KEPT} — small but documented \\
+    Composition NP                        & \textbf{KEPT} — symmetric formula, real CR$\to$SR effect \\
+    MET NP                                & \textbf{KEPT} — $3.7\sigma$ resolved bin pull \\
+    Prompt-subtraction $\pm 20\%$         & \textbf{KEPT} — standard literature size \\
+    Stat NP                               & \textbf{KEPT} — dominant at high $p_T$ \\
+    \midrule
+    MET cut on fake CR                    & \textbf{NOT applied} — flat scan, no benefit \\
+    $p_T$ cap                             & \textbf{NOT applied} — all bins pass diagnostic \\
+    Smoothing                             & \textbf{NOT applied} — yield change $<1\%$ \\
+    Anti-iso $\mu$ multijet test          & \textbf{NOT used} — superseded by MET split \\
+    Adding ttW/ttZ/tttt                   & \textbf{Optional} — $<5\%$ effect on prompt subtraction \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Code structure}
+  \scriptsize
+  \begin{tabular}{ll}
+    \toprule
+    Path & Purpose \\
+    \midrule
+    \fname{utils/SelectionUtils.h}   & EventData, regions, all helpers \\
+    \fname{utils/AtlasStyle.h}        & Plotting style + colors \\
+    \fname{efficiency/MC\_eff.C}      & MC prompt subtraction histos \\
+    \fname{efficiency/data\_eff.C}    & Data tight/loose histos \\
+    \fname{efficiency/real\_eff.C}    & $\varepsilon_r$ MC \\
+    \fname{efficiency/calculate\_fake\_rates.C} & 2D $\varepsilon_f$ \\
+    \fname{efficiency/build\_composition\_systematic.C} & comp NP \\
+    \fname{efficiency/build\_fake\_systematics.C}       & syst maps \\
+    \fname{efficiency/export\_for\_FakeBkgTools.C}      & framework input \\
+    \fname{AMM/AMM\_ElectronOnly.C}    & per-event weight ntuple \\
+    \fname{studies/}                   & cutflows / closure / yields \\
+    \fname{studies/checks/}            & cross-checks (this backup) \\
+    \fname{plotting/}                  & all final plots \\
+    \fname{run\_studies.sh}            & one-shot driver for the entire chain \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\end{document}
