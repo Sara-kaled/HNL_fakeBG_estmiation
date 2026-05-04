@@ -102,6 +102,7 @@ if [ $SKIP_EFF -eq 0 ] && should_run eff; then
 #    run_one "efficiency" "real_eff.C"                     "Real efficiency epsilon_r (MC truth-prompt)"
 #    run_one "efficiency" "calculate_fake_rates.C"         "Compute epsilon_f map"
 #    run_one "efficiency" "build_composition_systematic.C" "Composition NP (truth-source reweighting)"
+#    run_one "efficiency" "plot_composition_cr_sr.C"       "Plot CR vs SR fake-source composition"
  #   run_one "efficiency" "build_fake_systematics.C"       "Total systematic variations"
   #  run_one "efficiency" "build_uncertainties.C"          "Uncertainty breakdown table"
   #  run_one "efficiency" "export_for_FakeBkgTools.C"      "Export epsilon_f / epsilon_r for FakeBkgTools"

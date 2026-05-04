@@ -55,6 +55,13 @@ cp_if_exists "plotting/outputs/02_1d_rates/real/CR_met.pdf"             "$FIGS/C
 cp_if_exists "plotting/outputs/eff_maps/fake_eff_2D.pdf"                "$FIGS/fake_eff_2D.pdf"
 cp_if_exists "plotting/outputs/eff_maps/real_eff_2D.pdf"                "$FIGS/real_eff_2D.pdf"
 
+# ----- CR vs SR fake-composition comparison (efficiency/plot_composition_cr_sr.C) -----
+cp_if_exists "efficiency/outputs/composition_cr.pdf"                    "$FIGS/comp_cr.pdf"
+cp_if_exists "efficiency/outputs/composition_sr.pdf"                    "$FIGS/comp_sr.pdf"
+
+# ----- AMM validation in the VR (plotting/amm_validation_plots.C) -----
+cp_if_exists "plotting/outputs/amm_validation/VR.pdf"                   "$FIGS/amm_validation_VR.pdf"
+
 # ----- BG composition + studies -----
 cp_if_exists "studies/outputs/bkg_composition.pdf"                      "$FIGS/bkg_composition.pdf"
 
