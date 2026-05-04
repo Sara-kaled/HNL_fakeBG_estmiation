@@ -97,14 +97,14 @@ run_one() {
 # =============================================================================
 if [ $SKIP_EFF -eq 0 ] && should_run eff; then
     banner "PHASE 1 — Efficiency chain"
-    run_one "efficiency" "MC_eff.C"                       "MC prompt histograms"
-    run_one "efficiency" "data_eff.C"                     "Data tight/loose histograms"
-    run_one "efficiency" "real_eff.C"                     "Real efficiency epsilon_r (MC truth-prompt)"
-    run_one "efficiency" "calculate_fake_rates.C"         "Compute epsilon_f map"
-    run_one "efficiency" "build_composition_systematic.C" "Composition NP (truth-source reweighting)"
-    run_one "efficiency" "build_fake_systematics.C"       "Total systematic variations"
-    run_one "efficiency" "build_uncertainties.C"          "Uncertainty breakdown table"
-    run_one "efficiency" "export_for_FakeBkgTools.C"      "Export epsilon_f / epsilon_r for FakeBkgTools"
+#    run_one "efficiency" "MC_eff.C"                       "MC prompt histograms"
+#    run_one "efficiency" "data_eff.C"                     "Data tight/loose histograms"
+#    run_one "efficiency" "real_eff.C"                     "Real efficiency epsilon_r (MC truth-prompt)"
+#    run_one "efficiency" "calculate_fake_rates.C"         "Compute epsilon_f map"
+#    run_one "efficiency" "build_composition_systematic.C" "Composition NP (truth-source reweighting)"
+ #   run_one "efficiency" "build_fake_systematics.C"       "Total systematic variations"
+  #  run_one "efficiency" "build_uncertainties.C"          "Uncertainty breakdown table"
+  #  run_one "efficiency" "export_for_FakeBkgTools.C"      "Export epsilon_f / epsilon_r for FakeBkgTools"
 fi
 
 # =============================================================================
@@ -112,7 +112,7 @@ fi
 # =============================================================================
 if [ $SKIP_AMM -eq 0 ] && should_run amm; then
     banner "PHASE 2 — AMM per-event weights"
-    run_one "AMM" "AMM_ElectronOnly.C" "Apply AMM to data (writes data_with_electron_fake_weights.root)"
+  #  run_one "AMM" "AMM_ElectronOnly.C" "Apply AMM to data (writes data_with_electron_fake_weights.root)"
 fi
 
 # =============================================================================
@@ -120,14 +120,14 @@ fi
 # =============================================================================
 if [ $SKIP_STUDIES -eq 0 ] && should_run studies; then
     banner "PHASE 3 — Main studies"
-    run_one "studies" "MC_cutflow.C"                  "MC cutflow"
-    run_one "studies" "data_cutflow.C"                "Data cutflow"
-    run_one "studies" "fake_cutflow.C"                "Fake cutflow (AMM-weighted)"
-    run_one "studies" "fake_yields_correct.C"         "Fake yield table"
-    run_one "studies" "mc_closure_fake.C"             "MC closure with diagnostics"
-    run_one "studies" "met_systematic_investigation.C" "MET-split significance test"
-    run_one "studies" "bkg_composition.C"             "BG composition per region"
-    run_one "studies" "print_yields_latex.C"          "Yields LaTeX table"
+ #   run_one "studies" "MC_cutflow.C"                  "MC cutflow"
+ #   run_one "studies" "data_cutflow.C"                "Data cutflow"
+ #   run_one "studies" "fake_cutflow.C"                "Fake cutflow (AMM-weighted)"
+ #   run_one "studies" "fake_yields_correct.C"         "Fake yield table"
+  #  run_one "studies" "mc_closure_fake.C"             "MC closure with diagnostics"
+  #  run_one "studies" "met_systematic_investigation.C" "MET-split significance test"
+  #  run_one "studies" "bkg_composition.C"             "BG composition per region"
+  #  run_one "studies" "print_yields_latex.C"          "Yields LaTeX table"
 fi
 
 # =============================================================================
@@ -135,17 +135,17 @@ fi
 # =============================================================================
 if [ $SKIP_CHECKS -eq 0 ] && should_run checks; then
     banner "PHASE 4 — Cross-checks"
-    run_one "studies/checks" "fake_factor_compare.C"      "Fake factor vs Matrix method"
-    run_one "studies/checks" "justify_pt_cap.C"           "pT-cap diagnostic"
-    run_one "studies/checks" "sf_distributions.C"         "Charge-misID & ECIDS SF"
-    run_one "studies/checks" "truth_source_breakdown.C"   "Truth source breakdown"
-    run_one "studies/checks" "data_mc_loose_ratio.C"      "data / MC_prompt loose ratio"
-    run_one "studies/checks" "d0sig_distribution.C"       "|d0sig| of loose fakes"
-    run_one "studies/checks" "dR_jet_distribution.C"      "DeltaR(e, jet) of loose fakes"
-    run_one "studies/checks" "fake_source_diagnostics.C"  "Fake source vs all variables"
-    run_one "studies/checks" "met_split_test.C"           "MET-split multijet test"
-    run_one "studies/checks" "multijet_test.C"            "Anti-iso muon multijet test"
-    run_one "studies/checks" "eps_f_vs_met_cut.C"         "epsilon_f vs MET cut scan"
+  #  run_one "studies/checks" "fake_factor_compare.C"      "Fake factor vs Matrix method"
+  #  run_one "studies/checks" "justify_pt_cap.C"           "pT-cap diagnostic"
+  #  run_one "studies/checks" "sf_distributions.C"         "Charge-misID & ECIDS SF"
+  #  run_one "studies/checks" "truth_source_breakdown.C"   "Truth source breakdown"
+  #  run_one "studies/checks" "data_mc_loose_ratio.C"      "data / MC_prompt loose ratio"
+  #  run_one "studies/checks" "d0sig_distribution.C"       "|d0sig| of loose fakes"
+  #  run_one "studies/checks" "dR_jet_distribution.C"      "DeltaR(e, jet) of loose fakes"
+  #  run_one "studies/checks" "fake_source_diagnostics.C"  "Fake source vs all variables"
+  #  run_one "studies/checks" "met_split_test.C"           "MET-split multijet test"
+  #  run_one "studies/checks" "multijet_test.C"            "Anti-iso muon multijet test"
+  #  run_one "studies/checks" "eps_f_vs_met_cut.C"         "epsilon_f vs MET cut scan"
 fi
 
 # =============================================================================
@@ -153,9 +153,9 @@ fi
 # =============================================================================
 if [ $SKIP_SMOOTH -eq 0 ] && should_run smooth; then
     banner "PHASE 5 — Smoothing study"
-    run_one "studies/smoothing_test" "smooth_fake_eff.C"      "Smooth epsilon_f map (cubic spline)"
-    run_one "studies/smoothing_test" "amm_compare_smoothed.C" "AMM raw vs smoothed (data16)"
-    run_one "studies/smoothing_test" "plot_compare.C"         "Comparison plot"
+ #   run_one "studies/smoothing_test" "smooth_fake_eff.C"      "Smooth epsilon_f map (cubic spline)"
+ #   run_one "studies/smoothing_test" "amm_compare_smoothed.C" "AMM raw vs smoothed (data16)"
+  #  run_one "studies/smoothing_test" "plot_compare.C"         "Comparison plot"
 fi
 
 # =============================================================================
@@ -163,10 +163,10 @@ fi
 # =============================================================================
 if [ $SKIP_PLOTS -eq 0 ] && should_run plots; then
     banner "PHASE 6 — Plotting"
-    run_one "plotting" "plot_eff_maps.C"            "2D epsilon_f and epsilon_r maps"
-    run_one "plotting" "plot_real.C"                "Real efficiency plots"
-    run_one "plotting" "plot_rates_1d.C"            "1D fake & real efficiencies"
-    run_one "plotting" "plot_fake_rates_sliced.C"   "Fake rate sliced views"
+  #  run_one "plotting" "plot_eff_maps.C"            "2D epsilon_f and epsilon_r maps"
+  #  run_one "plotting" "plot_real.C"                "Real efficiency plots"
+  #  run_one "plotting" "plot_rates_1d.C"            "1D fake & real efficiencies"
+  #  run_one "plotting" "plot_fake_rates_sliced.C"   "Fake rate sliced views"
     run_one "plotting" "fake_real_CRs.C"            "Fake/real CR data-MC plots"
     run_one "plotting" "fake_comp.C"                "Fake composition plot"
     run_one "plotting" "plot_cr_num_den.C"          "CR numerator/denominator"

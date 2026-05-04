@@ -71,6 +71,13 @@ cp_if_exists "studies/checks/outputs/justify_pt_cap.pdf"                "$FIGS/j
 cp_if_exists "studies/checks/outputs/multijet_test.pdf"                 "$FIGS/multijet_test.pdf"
 cp_if_exists "studies/checks/outputs/fake_source_diagnostics.pdf"       "$FIGS/fake_source_diagnostics.pdf"
 
+# ----- Preselection plots (data/MC, no fake estimate) — used in backup -----
+cp_if_exists "plotting/outputs/presel/mll.pdf"                          "$FIGS/presel_mll.pdf"
+cp_if_exists "plotting/outputs/presel/mjj.pdf"                          "$FIGS/presel_mjj.pdf"
+cp_if_exists "plotting/outputs/presel/l1_pt.pdf"                        "$FIGS/presel_l1pt.pdf"
+cp_if_exists "plotting/outputs/presel/l2_pt.pdf"                        "$FIGS/presel_l2pt.pdf"
+cp_if_exists "plotting/outputs/presel/met.pdf"                          "$FIGS/presel_met.pdf"
+
 # ----- Smoothing -----
 cp_if_exists "studies/smoothing_test/outputs/smoothing_diagnostic.pdf"  "$FIGS/smoothing_diagnostic.pdf"
 cp_if_exists "studies/smoothing_test/outputs/compare_smoothing.pdf"     "$FIGS/compare_smoothing.pdf"
